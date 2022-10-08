@@ -1,4 +1,4 @@
-import psl, { ParsedDomain, ParseError } from 'psl'
+import psl, { ParsedDomain } from 'psl'
 import { faker } from '@faker-js/faker'
 import { ImportContactsFromGoogleSheetsToHubspot } from '@/usecases/import-contacts-from-googlesheets-to-hubspot'
 import { MissingParamError } from '@/usecases/errors'
