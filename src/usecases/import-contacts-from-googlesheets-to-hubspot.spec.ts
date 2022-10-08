@@ -195,4 +195,11 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     const result = sut.execute(makeProps())
     await expect(result).rejects.toThrow()
   })
+
+  it('should return undefined on success', async () => {
+    const { sut } = makeSut()
+    const props = makeProps()
+    const result = await sut.execute(props)
+    expect(result).toBeUndefined()
+  })
 })
