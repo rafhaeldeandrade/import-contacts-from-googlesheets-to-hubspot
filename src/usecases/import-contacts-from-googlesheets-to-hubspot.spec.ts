@@ -184,4 +184,15 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     expect(addSpy).toHaveBeenCalledTimes(1)
     expect(addSpy).toHaveBeenCalledWith(contactsWithDomainsMatching)
   })
+
+  it('should throw if addContactsToHubspot throws', async () => {
+    const { sut, retrieveWebsiteDomainStub } = makeSut()
+    jest
+      .spyOn(retrieveWebsiteDomainStub, 'retrieve')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
+    const result = sut.execute(makeProps())
+    await expect(result).rejects.toThrow()
+  })
 })
