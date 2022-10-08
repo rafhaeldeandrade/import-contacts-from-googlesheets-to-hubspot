@@ -1,4 +1,5 @@
 import { MissingParamError } from '@/usecases/errors'
+import { FetchContactsFromGoogleSheets } from '@/usecases/contracts'
 
 interface ImportContactsFromGoogleSheetsToHubspotInput {
   spreadsheetId: string
@@ -6,8 +7,16 @@ interface ImportContactsFromGoogleSheetsToHubspotInput {
 }
 
 export class ImportContactsFromGoogleSheetsToHubspot {
-  execute(params: ImportContactsFromGoogleSheetsToHubspotInput): void {
+  constructor(
+    private readonly fetchContactsFromGoogleSheets: FetchContactsFromGoogleSheets
+  ) {}
+
+  async execute(
+    params: ImportContactsFromGoogleSheetsToHubspotInput
+  ): Promise<void> {
     this.validateParams(params)
+    const { spreadsheetId, pageName } = params
+    await this.fetchContactsFromGoogleSheets.fetch(spreadsheetId, pageName)
   }
 
   validateParams(params: ImportContactsFromGoogleSheetsToHubspotInput): void {
