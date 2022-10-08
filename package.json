@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
+    "google-auth": "ts-node src/main/config/googleapis/google-auth.ts",
     "lint-staged": "lint-staged",
     "test:unit": "jest --config ./jest.config.ts --watch",
     "test:commit": "jest --config ./jest.config.ts --passWithNoTests",
@@ -33,6 +34,7 @@
     "prettier": "2.5.1",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0",
     "typescript": "^4.8.4"
   },
   "dependencies": {
