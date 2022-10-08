@@ -1,15 +1,24 @@
+import psl, { ParsedDomain, ParseError } from 'psl'
 import { faker } from '@faker-js/faker'
 import { ImportContactsFromGoogleSheetsToHubspot } from '@/usecases/import-contacts-from-googlesheets-to-hubspot'
 import { MissingParamError } from '@/usecases/errors'
 import {
+  AddContactsToHubspot,
   Contact,
   FetchContactsFromGoogleSheets,
   RetrieveWebsiteDomain,
 } from '@/usecases/contracts'
 
+class AddContactsToHubspotStub implements AddContactsToHubspot {
+  async add(contacts: Contact[]): Promise<void> {
+    return Promise.resolve()
+  }
+}
+
 class RetrieveWebsiteDomainStub implements RetrieveWebsiteDomain {
   retrieve(websiteUrl: string): string {
-    return faker.internet.domainName()
+    const parsed = psl.parse(websiteUrl) as ParsedDomain
+    return parsed.domain as string
   }
 }
 
@@ -46,20 +55,24 @@ interface SutTypes {
   sut: ImportContactsFromGoogleSheetsToHubspot
   fetchContactsFromGoogleSheetsStub: FetchContactsFromGoogleSheets
   retrieveWebsiteDomainStub: RetrieveWebsiteDomain
+  addContactsToHubspotStub: AddContactsToHubspot
 }
 
 function makeSut(): SutTypes {
   const fetchContactsFromGoogleSheetsStub =
     new FetchContactsFromGoogleSheetsStub()
   const retrieveWebsiteDomainStub = new RetrieveWebsiteDomainStub()
+  const addContactsToHubspotStub = new AddContactsToHubspotStub()
   const sut = new ImportContactsFromGoogleSheetsToHubspot(
     fetchContactsFromGoogleSheetsStub,
-    retrieveWebsiteDomainStub
+    retrieveWebsiteDomainStub,
+    addContactsToHubspotStub
   )
   return {
     sut,
     fetchContactsFromGoogleSheetsStub,
     retrieveWebsiteDomainStub,
+    addContactsToHubspotStub,
   }
 }
 
@@ -101,13 +114,54 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     expect(retrieveSpy).toHaveBeenCalledTimes(
       fetchContactsFromGoogleSheetsStubReturn.length
     )
+    const firstElementWebsiteUrlWithoutProtocol =
+      fetchContactsFromGoogleSheetsStubReturn[0].website.replace(
+        /(^\w+:|^)\/\//,
+        ''
+      )
     expect(retrieveSpy).toHaveBeenCalledWith(
-      fetchContactsFromGoogleSheetsStubReturn[0].website
+      firstElementWebsiteUrlWithoutProtocol
     )
     const lastFetchContactsIndex =
       fetchContactsFromGoogleSheetsStubReturn.length - 1
+    const lastElementWebsiteUrlWithoutProtocol =
+      fetchContactsFromGoogleSheetsStubReturn[
+        lastFetchContactsIndex
+      ].website.replace(/(^\w+:|^)\/\//, '')
     expect(retrieveSpy).toHaveBeenLastCalledWith(
-      fetchContactsFromGoogleSheetsStubReturn[lastFetchContactsIndex].website
+      lastElementWebsiteUrlWithoutProtocol
     )
+  })
+
+  it('should call addContactsToHubspot.add with correct params', async () => {
+    const { sut, fetchContactsFromGoogleSheetsStub, addContactsToHubspotStub } =
+      makeSut()
+    const props = makeProps()
+    const contactsWithDomainsMatching = [
+      {
+        name: faker.name.fullName(),
+        email: 'faker@faker.com',
+        company: faker.company.name(),
+        website: 'http://faker.com',
+        phone: faker.phone.number(),
+      },
+      {
+        name: faker.name.fullName(),
+        email: 'any_email@anydomain.net',
+        company: faker.company.name(),
+        website: 'https://anydomain.net',
+        phone: faker.phone.number(),
+      },
+    ]
+    fetchContactsFromGoogleSheetsStub.fetch = jest
+      .fn()
+      .mockResolvedValueOnce([
+        ...fetchContactsFromGoogleSheetsStubReturn,
+        ...contactsWithDomainsMatching,
+      ])
+    const addSpy = jest.spyOn(addContactsToHubspotStub, 'add')
+    await sut.execute(props)
+    expect(addSpy).toHaveBeenCalledTimes(1)
+    expect(addSpy).toHaveBeenCalledWith(contactsWithDomainsMatching)
   })
 })
