@@ -4,11 +4,13 @@ import { MissingParamError } from '@/usecases/errors'
 
 interface Props {
   spreadsheetId: string
+  pageName: string
 }
 
 function makeProps(): Props {
   return {
     spreadsheetId: faker.datatype.uuid(),
+    pageName: faker.datatype.string(),
   }
 }
 
@@ -35,6 +37,15 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     const { spreadsheetId, ...rest } = props
     expect(() => sut.execute(rest as any)).toThrow(
       new MissingParamError('spreadsheetId')
+    )
+  })
+
+  it('should throw MissingParamError if pageName isnt provided', () => {
+    const { sut } = makeSut()
+    const props = makeProps()
+    const { pageName, ...rest } = props
+    expect(() => sut.execute(rest as any)).toThrow(
+      new MissingParamError('pageName')
     )
   })
 })
