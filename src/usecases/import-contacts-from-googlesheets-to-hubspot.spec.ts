@@ -1,21 +1,32 @@
 import { faker } from '@faker-js/faker'
 import { ImportContactsFromGoogleSheetsToHubspot } from '@/usecases/import-contacts-from-googlesheets-to-hubspot'
 import { MissingParamError } from '@/usecases/errors'
-import { Contact, FetchContactsFromGoogleSheets } from '@/usecases/contracts'
+import {
+  Contact,
+  FetchContactsFromGoogleSheets,
+  RetrieveWebsiteDomain,
+} from '@/usecases/contracts'
 
+class RetrieveWebsiteDomainStub implements RetrieveWebsiteDomain {
+  retrieve(websiteUrl: string): string {
+    return faker.internet.domainName()
+  }
+}
+
+const fetchContactsFromGoogleSheetsStubReturn = Array.from({
+  length: faker.datatype.number(10),
+}).map(() => ({
+  name: faker.name.fullName(),
+  email: faker.internet.email(),
+  company: faker.company.name(),
+  website: faker.internet.url(),
+  phone: faker.phone.number(),
+}))
 class FetchContactsFromGoogleSheetsStub
   implements FetchContactsFromGoogleSheets
 {
   async fetch(spreadsheetId: string, pageName: string): Promise<Contact[]> {
-    return [
-      {
-        name: faker.name.fullName(),
-        email: faker.internet.email(),
-        company: faker.company.name(),
-        website: faker.internet.url(),
-        phone: faker.phone.number(),
-      },
-    ]
+    return fetchContactsFromGoogleSheetsStubReturn
   }
 }
 
@@ -34,17 +45,21 @@ function makeProps(): Props {
 interface SutTypes {
   sut: ImportContactsFromGoogleSheetsToHubspot
   fetchContactsFromGoogleSheetsStub: FetchContactsFromGoogleSheets
+  retrieveWebsiteDomainStub: RetrieveWebsiteDomain
 }
 
 function makeSut(): SutTypes {
   const fetchContactsFromGoogleSheetsStub =
     new FetchContactsFromGoogleSheetsStub()
+  const retrieveWebsiteDomainStub = new RetrieveWebsiteDomainStub()
   const sut = new ImportContactsFromGoogleSheetsToHubspot(
-    fetchContactsFromGoogleSheetsStub
+    fetchContactsFromGoogleSheetsStub,
+    retrieveWebsiteDomainStub
   )
   return {
     sut,
     fetchContactsFromGoogleSheetsStub,
+    retrieveWebsiteDomainStub,
   }
 }
 
@@ -76,5 +91,23 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     const fetchSpy = jest.spyOn(fetchContactsFromGoogleSheetsStub, 'fetch')
     await sut.execute(props)
     expect(fetchSpy).toHaveBeenCalledWith(props.spreadsheetId, props.pageName)
+  })
+
+  it('should call retrieveWebsiteDomain.retrieve to remove entries where domain name is different from email domain name, with correct params', async () => {
+    const { sut, retrieveWebsiteDomainStub } = makeSut()
+    const props = makeProps()
+    const retrieveSpy = jest.spyOn(retrieveWebsiteDomainStub, 'retrieve')
+    await sut.execute(props)
+    expect(retrieveSpy).toHaveBeenCalledTimes(
+      fetchContactsFromGoogleSheetsStubReturn.length
+    )
+    expect(retrieveSpy).toHaveBeenCalledWith(
+      fetchContactsFromGoogleSheetsStubReturn[0].website
+    )
+    const lastFetchContactsIndex =
+      fetchContactsFromGoogleSheetsStubReturn.length - 1
+    expect(retrieveSpy).toHaveBeenLastCalledWith(
+      fetchContactsFromGoogleSheetsStubReturn[lastFetchContactsIndex].website
+    )
   })
 })
