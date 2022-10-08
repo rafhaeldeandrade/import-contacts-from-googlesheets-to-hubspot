@@ -142,6 +142,17 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     )
   })
 
+  it('should throw if retrieveWebsiteDomain throws', async () => {
+    const { sut, retrieveWebsiteDomainStub } = makeSut()
+    jest
+      .spyOn(retrieveWebsiteDomainStub, 'retrieve')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
+    const result = sut.execute(makeProps())
+    await expect(result).rejects.toThrow()
+  })
+
   it('should call addContactsToHubspot.add with correct params', async () => {
     const { sut, fetchContactsFromGoogleSheetsStub, addContactsToHubspotStub } =
       makeSut()
