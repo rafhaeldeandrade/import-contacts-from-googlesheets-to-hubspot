@@ -106,6 +106,15 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     expect(fetchSpy).toHaveBeenCalledWith(props.spreadsheetId, props.pageName)
   })
 
+  it('should throw if fetchContactsFromGoogleSheets throws', async () => {
+    const { sut, fetchContactsFromGoogleSheetsStub } = makeSut()
+    jest
+      .spyOn(fetchContactsFromGoogleSheetsStub, 'fetch')
+      .mockRejectedValueOnce(new Error())
+    const result = sut.execute(makeProps())
+    await expect(result).rejects.toThrow()
+  })
+
   it('should call retrieveWebsiteDomain.retrieve to remove entries where domain name is different from email domain name, with correct params', async () => {
     const { sut, retrieveWebsiteDomainStub } = makeSut()
     const props = makeProps()
