@@ -9,3 +9,7 @@ export type Contact = {
 export interface FetchContactsFromGoogleSheets {
   fetch(spreadsheetId: string, pageName: string): Promise<Contact[]>
 }
+
+export interface RetrieveWebsiteDomain {
+  retrieve(websiteUrl: string): string
+}
