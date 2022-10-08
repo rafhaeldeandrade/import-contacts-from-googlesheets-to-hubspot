@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
-    "google-auth": "ts-node src/main/config/googleapis/google-auth.ts",
+    "start": "ts-node -r tsconfig-paths/register src/main/start.ts",
+    "google-auth": "ts-node -r tsconfig-paths/register src/main/config/googleapis/google-auth.ts",
     "lint-staged": "lint-staged",
     "test:unit": "jest --config ./jest.config.ts --watch",
     "test:commit": "jest --config ./jest.config.ts --passWithNoTests",
@@ -22,6 +23,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/jest": "^29.1.2",
     "@types/psl": "^1.1.0",
+    "@types/yargs": "^17.0.13",
     "@typescript-eslint/eslint-plugin": "5.10.0",
     "@typescript-eslint/parser": "5.10.0",
     "dotenv": "^16.0.3",
@@ -39,6 +41,7 @@
   },
   "dependencies": {
     "googleapis": "^108.0.0",
-    "psl": "^1.9.0"
+    "psl": "^1.9.0",
+    "yargs": "^17.6.0"
   }
 }
