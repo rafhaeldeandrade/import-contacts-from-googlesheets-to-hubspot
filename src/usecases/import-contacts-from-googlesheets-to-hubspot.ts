@@ -1,5 +1,6 @@
 import { MissingParamError } from '@/usecases/errors'
 import {
+  AddContactsToHubspot,
   Contact,
   FetchContactsFromGoogleSheets,
   RetrieveWebsiteDomain,
@@ -15,7 +16,8 @@ export class ImportContactsFromGoogleSheetsToHubspot {
 
   constructor(
     private readonly fetchContactsFromGoogleSheets: FetchContactsFromGoogleSheets,
-    private readonly retrieveWebsiteDomain: RetrieveWebsiteDomain
+    private readonly retrieveWebsiteDomain: RetrieveWebsiteDomain,
+    private readonly addContactsToHubspot: AddContactsToHubspot
   ) {}
 
   async execute(
@@ -28,6 +30,7 @@ export class ImportContactsFromGoogleSheetsToHubspot {
       pageName
     )
     this.cleanContacts(contacts)
+    await this.addContactsToHubspot.add(this.contacts)
   }
 
   validateParams(params: ImportContactsFromGoogleSheetsToHubspotInput): void {
@@ -37,10 +40,16 @@ export class ImportContactsFromGoogleSheetsToHubspot {
   }
 
   cleanContacts(contacts: Contact[]): void {
-    this.contacts = contacts.map((contact) => {
+    this.contacts = contacts.flatMap((contact) => {
       const emailDomain = contact.email.split('@')[1]
-      const websiteDomain = this.retrieveWebsiteDomain.retrieve(contact.website)
-      if (websiteDomain !== emailDomain) return
+      const websiteUrlWithoutProtocol = contact.website.replace(
+        /(^\w+:|^)\/\//,
+        ''
+      )
+      const websiteDomain = this.retrieveWebsiteDomain.retrieve(
+        websiteUrlWithoutProtocol
+      )
+      if (websiteDomain !== emailDomain) return []
       return {
         name: contact.name,
         email: contact.email,

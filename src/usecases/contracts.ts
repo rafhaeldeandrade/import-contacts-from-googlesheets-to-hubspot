@@ -13,3 +13,7 @@ export interface FetchContactsFromGoogleSheets {
 export interface RetrieveWebsiteDomain {
   retrieve(websiteUrl: string): string
 }
+
+export interface AddContactsToHubspot {
+  add(contacts: (Contact | undefined)[]): Promise<void>
+}
