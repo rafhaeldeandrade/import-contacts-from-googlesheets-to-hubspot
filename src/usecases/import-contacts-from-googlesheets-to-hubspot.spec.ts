@@ -1,6 +1,23 @@
 import { faker } from '@faker-js/faker'
 import { ImportContactsFromGoogleSheetsToHubspot } from '@/usecases/import-contacts-from-googlesheets-to-hubspot'
 import { MissingParamError } from '@/usecases/errors'
+import { Contact, FetchContactsFromGoogleSheets } from '@/usecases/contracts'
+
+class FetchContactsFromGoogleSheetsStub
+  implements FetchContactsFromGoogleSheets
+{
+  async fetch(spreadsheetId: string, pageName: string): Promise<Contact[]> {
+    return [
+      {
+        name: faker.name.fullName(),
+        email: faker.internet.email(),
+        company: faker.company.name(),
+        website: faker.internet.url(),
+        phone: faker.phone.number(),
+      },
+    ]
+  }
+}
 
 interface Props {
   spreadsheetId: string
@@ -16,12 +33,18 @@ function makeProps(): Props {
 
 interface SutTypes {
   sut: ImportContactsFromGoogleSheetsToHubspot
+  fetchContactsFromGoogleSheetsStub: FetchContactsFromGoogleSheets
 }
 
 function makeSut(): SutTypes {
-  const sut = new ImportContactsFromGoogleSheetsToHubspot()
+  const fetchContactsFromGoogleSheetsStub =
+    new FetchContactsFromGoogleSheetsStub()
+  const sut = new ImportContactsFromGoogleSheetsToHubspot(
+    fetchContactsFromGoogleSheetsStub
+  )
   return {
     sut,
+    fetchContactsFromGoogleSheetsStub,
   }
 }
 
@@ -31,21 +54,27 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
     expect(sut).toBeDefined()
   })
 
-  it('should throw MissingParamError if spreadsheetId isnt provided', () => {
+  it('should throw MissingParamError if spreadsheetId isnt provided', async () => {
     const { sut } = makeSut()
     const props = makeProps()
     const { spreadsheetId, ...rest } = props
-    expect(() => sut.execute(rest as any)).toThrow(
-      new MissingParamError('spreadsheetId')
-    )
+    const result = sut.execute(rest as any)
+    await expect(result).rejects.toThrow(new MissingParamError('spreadsheetId'))
   })
 
-  it('should throw MissingParamError if pageName isnt provided', () => {
+  it('should throw MissingParamError if pageName isnt provided', async () => {
     const { sut } = makeSut()
     const props = makeProps()
     const { pageName, ...rest } = props
-    expect(() => sut.execute(rest as any)).toThrow(
-      new MissingParamError('pageName')
-    )
+    const result = sut.execute(rest as any)
+    await expect(result).rejects.toThrow(new MissingParamError('pageName'))
+  })
+
+  it('should call fetchContactsFromGoogleSheets.fetch with correct params', async () => {
+    const { sut, fetchContactsFromGoogleSheetsStub } = makeSut()
+    const props = makeProps()
+    const fetchSpy = jest.spyOn(fetchContactsFromGoogleSheetsStub, 'fetch')
+    await sut.execute(props)
+    expect(fetchSpy).toHaveBeenCalledWith(props.spreadsheetId, props.pageName)
   })
 })
