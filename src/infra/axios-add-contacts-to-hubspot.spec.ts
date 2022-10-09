@@ -5,6 +5,10 @@ import env from '@/main/config/env'
 import { AxiosAddContactsToHubspot } from '@/infra/axios-add-contacts-to-hubspot'
 
 describe('AxiosAddContactsToHubspot', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('should be defined', async () => {
     const sut = new AxiosAddContactsToHubspot()
     expect(sut).toBeDefined()
@@ -12,7 +16,10 @@ describe('AxiosAddContactsToHubspot', () => {
 
   it('should call axios.post with correct params', async () => {
     const sut = new AxiosAddContactsToHubspot()
-    const postSpy = jest.spyOn(axios, 'post')
+    axios.post = jest.fn()
+    const postSpy = jest
+      .spyOn(axios, 'post')
+      .mockImplementationOnce(() => Promise.resolve({}))
     const contacts = [
       {
         name: faker.name.firstName(),
@@ -83,6 +90,7 @@ describe('AxiosAddContactsToHubspot', () => {
         company: faker.company.name(),
       },
     ]
+    axios.post = jest.fn()
     jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error())
     const promise = sut.add(contacts)
     await expect(promise).rejects.toThrow(
