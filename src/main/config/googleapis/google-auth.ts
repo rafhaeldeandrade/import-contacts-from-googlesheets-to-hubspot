@@ -14,9 +14,4 @@ async function getAuthUrl() {
   console.log(`Vá até essa URL para conseguir um token de acesso:\n\n${url}\n`)
 }
 
-export async function getToken(code: string) {
-  const token = await oauth2Client.getToken(code)
-  console.log(token)
-}
-
 getAuthUrl()
