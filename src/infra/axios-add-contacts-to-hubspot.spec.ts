@@ -71,4 +71,24 @@ describe('AxiosAddContactsToHubspot', () => {
     const response = await sut.add(contacts)
     expect(response).toBeUndefined()
   })
+
+  it('should throw if axios throws', async () => {
+    const sut = new AxiosAddContactsToHubspot()
+    const contacts = [
+      {
+        name: faker.name.firstName(),
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        website: faker.internet.url(),
+        company: faker.company.name(),
+      },
+    ]
+    jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error())
+    const promise = sut.add(contacts)
+    await expect(promise).rejects.toThrow(
+      new Error(
+        'Something went wrong while adding contacts to Hubspot, verify your hubspot api key and try again'
+      )
+    )
+  })
 })
