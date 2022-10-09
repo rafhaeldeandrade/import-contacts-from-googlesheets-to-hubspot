@@ -3,7 +3,11 @@ import psl, { ParsedDomain } from 'psl'
 
 export class PslRetrieveWebsiteDomain implements RetrieveWebsiteDomain {
   retrieve(websiteUrl: string): string {
-    psl.parse(websiteUrl) as ParsedDomain
-    return ''
+    try {
+      psl.parse(websiteUrl) as ParsedDomain
+      return ''
+    } catch (e) {
+      throw new Error('Something went wrong, check your url and try again')
+    }
   }
 }
