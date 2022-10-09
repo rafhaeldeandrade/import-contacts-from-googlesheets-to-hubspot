@@ -11,7 +11,7 @@
     "lint-staged": "lint-staged",
     "test:unit": "jest --config ./jest.config.ts --watch",
     "test:commit": "jest --config ./jest.config.ts --passWithNoTests",
-    "test:ci": "jest --config ./jest.config.ts --passWithNoTests --coverage"
+    "test:ci": "jest --config ./jest.config.ts --coverage"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
