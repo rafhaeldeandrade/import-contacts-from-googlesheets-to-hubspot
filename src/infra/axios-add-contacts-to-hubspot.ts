@@ -24,7 +24,6 @@ export class AxiosAddContactsToHubspot implements AddContactsToHubspot {
         },
       }
     )
-    return Promise.resolve()
   }
 
   generateRequestBody(contacts: Contact[]): HubspotContact[] {
