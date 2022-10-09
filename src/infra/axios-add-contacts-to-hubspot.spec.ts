@@ -56,4 +56,19 @@ describe('AxiosAddContactsToHubspot', () => {
       }
     )
   })
+
+  it('should return undefined (return void) on success (status 202)', async () => {
+    const sut = new AxiosAddContactsToHubspot()
+    const contacts = [
+      {
+        name: faker.name.firstName(),
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        website: faker.internet.url(),
+        company: faker.company.name(),
+      },
+    ]
+    const response = await sut.add(contacts)
+    expect(response).toBeUndefined()
+  })
 })
