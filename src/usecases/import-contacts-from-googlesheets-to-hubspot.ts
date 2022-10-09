@@ -5,13 +5,14 @@ import {
   FetchContactsFromGoogleSheets,
   RetrieveWebsiteDomain,
 } from '@/usecases/contracts'
+import {
+  ImportContactsFromGoogleSheetsToHubspotUseCase,
+  ImportContactsFromGoogleSheetsToHubspotUseCaseInput,
+} from '@/domain/contracts'
 
-interface ImportContactsFromGoogleSheetsToHubspotInput {
-  spreadsheetId: string
-  pageName: string
-}
-
-export class ImportContactsFromGoogleSheetsToHubspot {
+export class ImportContactsFromGoogleSheetsToHubspot
+  implements ImportContactsFromGoogleSheetsToHubspotUseCase
+{
   contacts: (Contact | undefined)[] = []
 
   constructor(
@@ -21,7 +22,7 @@ export class ImportContactsFromGoogleSheetsToHubspot {
   ) {}
 
   async execute(
-    params: ImportContactsFromGoogleSheetsToHubspotInput
+    params: ImportContactsFromGoogleSheetsToHubspotUseCaseInput
   ): Promise<void> {
     this.validateParams(params)
     const { spreadsheetId, pageName } = params
@@ -33,7 +34,9 @@ export class ImportContactsFromGoogleSheetsToHubspot {
     await this.addContactsToHubspot.add(this.contacts)
   }
 
-  validateParams(params: ImportContactsFromGoogleSheetsToHubspotInput): void {
+  validateParams(
+    params: ImportContactsFromGoogleSheetsToHubspotUseCaseInput
+  ): void {
     const { spreadsheetId, pageName } = params
     if (!spreadsheetId) throw new MissingParamError('spreadsheetId')
     if (!pageName) throw new MissingParamError('pageName')
