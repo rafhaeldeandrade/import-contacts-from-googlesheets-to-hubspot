@@ -9,17 +9,17 @@ import { makeImportContactsFromGoogleSheetsToHubspot } from '@/main/factories/ma
 async function getArgs() {
   const args = await yargs(hideBin(process.argv)).argv
   const code = args['code'] as string
-  const sheetId = args['sheetId'] as string
+  const spreadsheetId = args['spreadsheetId'] as string
   const pageName = args['pageName'] as string
   if (!code) throw new MissingParamError('code')
-  if (!sheetId) throw new MissingParamError('sheetId')
+  if (!spreadsheetId) throw new MissingParamError('spreadsheetId')
   if (!pageName) throw new MissingParamError('pageName')
-  return { code, sheetId, pageName }
+  return { code, spreadsheetId, pageName }
 }
 
 async function main() {
   try {
-    const { code, sheetId, pageName } = await getArgs()
+    const { code, spreadsheetId, pageName } = await getArgs()
     const oauth2Client = makeOAuth2Client({
       clientId: env.oauth2.clientId,
       clientSecret: env.oauth2.clientSecret,
@@ -29,7 +29,7 @@ async function main() {
     const importContactsFromGoogleSheetsToHubspot =
       makeImportContactsFromGoogleSheetsToHubspot(oauth2Client)
     await importContactsFromGoogleSheetsToHubspot.execute({
-      spreadsheetId: sheetId,
+      spreadsheetId,
       pageName,
     })
     console.log('Contatos importados com sucesso!')
