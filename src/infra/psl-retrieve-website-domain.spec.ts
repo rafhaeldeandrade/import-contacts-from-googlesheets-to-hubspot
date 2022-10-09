@@ -17,4 +17,15 @@ describe('PslRetrieveWebsiteDomain', () => {
     expect(parseSpy).toHaveBeenCalledTimes(1)
     expect(parseSpy).toHaveBeenCalledWith(websiteUrl)
   })
+
+  it('should throw if psl.parse throws', () => {
+    const sut = new PslRetrieveWebsiteDomain()
+    const websiteUrl = faker.internet.url()
+    jest.spyOn(psl, 'parse').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    expect(() => sut.retrieve(websiteUrl)).toThrow(
+      new Error('Something went wrong, check your url and try again')
+    )
+  })
 })
