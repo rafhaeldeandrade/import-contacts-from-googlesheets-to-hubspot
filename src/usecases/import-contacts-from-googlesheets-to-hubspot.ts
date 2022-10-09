@@ -30,7 +30,8 @@ export class ImportContactsFromGoogleSheetsToHubspot
       spreadsheetId,
       pageName
     )
-    this.cleanContacts(contacts)
+    this.validateContacts(contacts)
+    this.removeContactsWithoutCorporativeEmail(contacts)
     await this.addContactsToHubspot.add(this.contacts)
   }
 
@@ -42,7 +43,13 @@ export class ImportContactsFromGoogleSheetsToHubspot
     if (!pageName) throw new MissingParamError('pageName')
   }
 
-  cleanContacts(contacts: Contact[]): void {
+  validateContacts(contact: Contact[]): void {
+    if (contact.length === 0) {
+      throw new Error('Spreadsheet is empty! Populate it and try again later.')
+    }
+  }
+
+  removeContactsWithoutCorporativeEmail(contacts: Contact[]): void {
     this.contacts = contacts.flatMap((contact) => {
       const emailDomain = contact.email.split('@')[1]
       const websiteUrlWithoutProtocol = contact.website.replace(
