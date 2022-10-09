@@ -77,6 +77,10 @@ function makeSut(): SutTypes {
 }
 
 describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('should be defined', () => {
     const { sut } = makeSut()
     expect(sut).toBeDefined()
@@ -113,6 +117,17 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
       .mockRejectedValueOnce(new Error())
     const result = sut.execute(makeProps())
     await expect(result).rejects.toThrow()
+  })
+
+  it('should throw if fetchContactsFromGoogleSheets returns empty array', async () => {
+    const { sut, fetchContactsFromGoogleSheetsStub } = makeSut()
+    jest
+      .spyOn(fetchContactsFromGoogleSheetsStub, 'fetch')
+      .mockResolvedValueOnce([])
+    const result = sut.execute(makeProps())
+    await expect(result).rejects.toThrow(
+      new Error('Spreadsheet is empty! Populate it and try again later.')
+    )
   })
 
   it('should call retrieveWebsiteDomain.retrieve to remove entries where domain name is different from email domain name, with correct params', async () => {
@@ -173,8 +188,8 @@ describe('ImportContactsFromGoogleSheetsToHubspot Unit Test', () => {
         phone: faker.phone.number(),
       },
     ]
-    fetchContactsFromGoogleSheetsStub.fetch = jest
-      .fn()
+    jest
+      .spyOn(fetchContactsFromGoogleSheetsStub, 'fetch')
       .mockResolvedValueOnce([
         ...fetchContactsFromGoogleSheetsStubReturn,
         ...contactsWithDomainsMatching,
