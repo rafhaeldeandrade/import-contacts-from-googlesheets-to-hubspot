@@ -7,7 +7,6 @@ export class PslRetrieveWebsiteDomain implements RetrieveWebsiteDomain {
       const parsed = psl.parse(websiteUrl) as ParsedDomain
       return parsed.domain as string
     } catch (e) {
-      console.log(e)
       throw new Error('Something went wrong, check your url and try again')
     }
   }
