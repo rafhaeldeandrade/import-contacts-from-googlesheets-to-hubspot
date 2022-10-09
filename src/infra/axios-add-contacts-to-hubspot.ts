@@ -14,16 +14,22 @@ interface HubspotContact {
 
 export class AxiosAddContactsToHubspot implements AddContactsToHubspot {
   async add(contacts: Contact[]): Promise<void> {
-    const hubspotContacts = this.generateRequestBody(contacts)
-    await axios.post(
-      'https://api.hubapi.com/contacts/v1/contact/batch/',
-      hubspotContacts,
-      {
-        headers: {
-          Authorization: `Bearer ${env.hubspotApiKey}`,
-        },
-      }
-    )
+    try {
+      const hubspotContacts = this.generateRequestBody(contacts)
+      await axios.post(
+        'https://api.hubapi.com/contacts/v1/contact/batch/',
+        hubspotContacts,
+        {
+          headers: {
+            Authorization: `Bearer ${env.hubspotApiKey}`,
+          },
+        }
+      )
+    } catch (e) {
+      throw new Error(
+        'Something went wrong while adding contacts to Hubspot, verify your hubspot api key and try again'
+      )
+    }
   }
 
   generateRequestBody(contacts: Contact[]): HubspotContact[] {
