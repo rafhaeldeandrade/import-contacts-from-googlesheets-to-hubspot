@@ -44,12 +44,13 @@ Para instalar o projeto, siga estas etapas:
 Para usar o projeto, siga estas etapas:
 
 1. Abra o terminal, entre no diretório em que o projeto foi clonado
-2. Inicie o script para permitir que o aplicativo tenha acesso `readonly` aos seus spreadsheets do Google rodando o script `yarn google-auth` ou `npm run google-auth`
-3. Copie a url gerada e cole no browser para prosseguir com a autorização
+2. Rode o script de build `yarn build` ou `npm run build` para transpilar os arquivos `.ts` em `.js`.
+3. Inicie o script para permitir que o aplicativo tenha acesso `readonly` aos seus spreadsheets do Google rodando o script `yarn google-auth` ou `npm run google-auth`
+4. Copie a url gerada e cole no browser para prosseguir com a autorização
    <img src="https://i.imgur.com/BLI7N4w.png" alt="rodando script google-auth">
-4. Copie o código gerado no final da autorização, para isso, pode-se clicar no ícone marcado com vermelho
+5. Copie o código gerado no final da autorização, para isso, pode-se clicar no ícone marcado com vermelho
    <img src="https://i.imgur.com/GVwPKW5.png" alt="primeira tela da autorização" width="463" height="600">
    <img src="https://i.imgur.com/njl2j4F.png" alt="última tela da autorização" width="463" height="600">
-5. Tenha certeza de que a primeira linha do spreadsheet está com os headers corretos: `Nome da empresa`, `Nome completo`, `Email`, `Telefone`, `Website`. Exemplo: [Link para o spreadsheet de exemplo](https://docs.google.com/spreadsheets/d/19E2iYFSF2ikxLLWi3n_p0Uy6Udf8qBmuyGxLfmWDoSY/edit?usp=sharing)
-6. Tenha o id do spreadsheet e o nome da página em que os contatos estão [Mini-tutorial](https://i.imgur.com/mF3afn5.png)
-7. Retorne ao terminal com o código de autorização, id do spreadsheet e o nome da página em mãos e rode o script `yarn start --code <CÓDIGO DE AUTORIZAÇÃo DO GOOGLE> --spreadsheetId <ID DO SPREADSHEET> --pageName <NOME DA PÁGINA>` ou `npm start -- --code <CÓDIGO DE AUTORIZAÇÃo DO GOOGLE> --spreadsheetId <ID DO SPREADSHEET> --pageName <NOME DA PÁGINA>`
+6. Tenha certeza de que a primeira linha do spreadsheet está com os headers corretos: `Nome da empresa`, `Nome completo`, `Email`, `Telefone`, `Website`. Exemplo: [Link para o spreadsheet de exemplo](https://docs.google.com/spreadsheets/d/19E2iYFSF2ikxLLWi3n_p0Uy6Udf8qBmuyGxLfmWDoSY/edit?usp=sharing)
+7. Tenha o id do spreadsheet e o nome da página em que os contatos estão [Mini-tutorial](https://i.imgur.com/mF3afn5.png)
+8. Retorne ao terminal com o código de autorização, id do spreadsheet e o nome da página em mãos e rode o script `yarn start --code <CÓDIGO DE AUTORIZAÇÃo DO GOOGLE> --spreadsheetId <ID DO SPREADSHEET> --pageName <NOME DA PÁGINA>` ou `npm start -- --code <CÓDIGO DE AUTORIZAÇÃo DO GOOGLE> --spreadsheetId <ID DO SPREADSHEET> --pageName <NOME DA PÁGINA>`
